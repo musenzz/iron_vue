@@ -20,16 +20,6 @@
       </el-form-item>
       <el-button  type="primary" @click="handleLogin">Login</el-button>
     </el-form>
-
-    <div>
-      下面是vuex：this.$store.state.count 获得的数据:
-      <h2>{{  this.$store.state.count  }}</h2>
-      下面是vuex：this.$store.getters.getStateCount获得的数据:
-      <h2>{{ this.$store.getters.getStateCount }}</h2>
-
-      <button @click="addS">+</button>
-      <button @click="reduceS">-</button>
-    </div>
   </div>
 </template>
 
@@ -39,8 +29,8 @@ export default {
   data () {
     return {
       loginForm: {
-        username: '',
-        password: ''
+        username: 'admin',
+        password: '111111'
       }
     }
   },
@@ -48,7 +38,6 @@ export default {
     handleLogin () {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          console.log('ddddddd')
           // this.loading = true
           this.$store.dispatch('login', this.loginForm)
             .then(() => {

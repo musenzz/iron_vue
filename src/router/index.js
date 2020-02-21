@@ -3,15 +3,23 @@ import Router from 'vue-router'
 import User from '@/components/user/User'
 import UserProfile from '@/components/user/UserProfile'
 import UserPosts from '@/components/user/UserPosts'
-import Index from '@/views/dashboard/index'
+import Layout from '@/layout'
 
 Vue.use(Router)
 
 export const constantRoutes = [
   {
     path: '/',
-    component: Index,
-    name: 'index'
+    component: Layout,
+    redirect: '/dashboard',
+    children: [
+      {
+        path: 'dashboard',
+        component: () => import('@/views/dashboard/index'),
+        name: 'Dashboard',
+        meta: { title: 'Dashboard', icon: 'dashboard', affix: true }
+      }
+    ]
   },
   {
     path: '/login',

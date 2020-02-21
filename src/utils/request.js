@@ -2,6 +2,7 @@ import axios from 'axios'
 import store from '@/store'
 import Vue from 'vue'
 import {Message, MessageBox} from 'element-ui'
+import {getToken} from './cookies'
 
 Vue.prototype.$axios = axios // 将axios挂载在Vue实例原型上
 
@@ -12,6 +13,7 @@ const service = axios.create({
 
 service.interceptors.request.use(function (config) {
   if (store.getters.token) {
+    config.headers['X-Token'] = getToken()
   }
   return config
 }, function (error) {

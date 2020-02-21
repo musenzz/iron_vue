@@ -1,16 +1,17 @@
 <template>
-  <div class="user">
-    <h2>Index</h2>
-    <router-view></router-view>
+  <div class="dashboard-container">
+    <component :is="currentRole" />
   </div>
 </template>
 
 <script>
+import adminDashboard from './admin'
 export default {
-  name: 'Index',
+  name: 'Dashboard',
+  components: { adminDashboard },
   data () {
     return {
-      msg: 'Index components'
+      currentRole: 'adminDashboard'
     }
   }
 }
@@ -18,21 +19,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  h1, h2 {
-    font-weight: normal;
-  }
-
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
-
-  li {
-    display: inline-block;
-    margin: 0 10px;
-  }
-
-  a {
-    color: #42b983;
-  }
 </style>
