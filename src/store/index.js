@@ -87,6 +87,14 @@ function convertRouter (menus) {
         isParent = true
       }
       let parent = assembleRouter(item, isParent)
+
+      let children = []
+      if (item.children){
+        item.children.forEach(child=>{
+          let subChiledren = []//子菜单
+
+        })
+      }
       accessedRouters.push(parent)
     })
   }
