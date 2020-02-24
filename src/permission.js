@@ -7,7 +7,7 @@ import {getToken} from './utils/cookies'
 
 const whiteList = ['/login'] // no redirect whitelist
 
-router.beforeEach( async (to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   NProgress.start()
   const hasToken = getToken()
   if (hasToken) {

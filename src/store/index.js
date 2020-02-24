@@ -20,12 +20,15 @@ const store = new Vuex.Store({
     name: '',
     avatar: '',
     roles: [],
-    routes:[]
+    routes: [],
+    views: ['/dashboard'],
+    visitedViews: []
   },
   getters: {
     token: state => state.token,
     roles: state => state.roles,
-    routes:state => state.routes
+    routes: state => state.routes,
+    visitedViews: state => state.visitedViews
   },
   mutations: {
     SET_TOKEN: (state, token) => {
@@ -36,6 +39,14 @@ const store = new Vuex.Store({
     },
     SET_ROUTES: (state, routes) => {
       state.routes = routes
+    },
+    ADD_VISITED_VIEW: (state, view) => {
+      if (state.visitedViews.some(v => v.path === view.path)) return
+      state.visitedViews.push(
+        Object.assign({}, view, {
+          title: view.meta.title || 'no-name'
+        })
+      )
     }
   },
   actions: {
@@ -74,6 +85,12 @@ const store = new Vuex.Store({
         commit('SET_ROUTES', accessedRoutes)
         resolve(accessedRoutes)
       })
+    },
+    addVisitedView ({ commit }, view) {
+      commit('ADD_VISITED_VIEW', view)
+    },
+    addView ({ dispatch }, view) {
+      dispatch('addVisitedView', view)
     }
   }
 })
@@ -89,16 +106,18 @@ function convertRouter (menus) {
       let parent = assembleRouter(item, isParent)
 
       let children = []
-      if (item.children){
-        item.children.forEach(child=>{
-          let subChiledren = []//子菜单
-
+      if (item.children) {
+        item.children.forEach(child => {
+          let childNode = assembleRouter(child, false)
+          children.push(childNode)
         })
       }
+
+      parent.children = children
       accessedRouters.push(parent)
     })
   }
-
+  console.log(accessedRouters)
   return accessedRouters
 }
 
