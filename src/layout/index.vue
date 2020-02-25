@@ -18,7 +18,7 @@ import AppMain from './components/AppMain'
 // import { mapState } from 'vuex'
 export default {
   name: 'Layout',
-  components: {Sidebar, TagsView,AppMain},
+  components: {Sidebar, TagsView, AppMain},
   mixins: [ResizeMixin]
 }
 </script>

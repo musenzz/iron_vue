@@ -20,8 +20,8 @@ router.beforeEach(async (to, from, next) => {
         next()
       } else {
         try {
-          const {menus} = await store.dispatch('getBaseInfo')
-          const accessRoutes = await store.dispatch('generateRouter', menus)
+          const {menus} = await store.dispatch('user/getBaseInfo')
+          const accessRoutes = await store.dispatch('permission/generateRouter', menus)
           router.addRoutes(accessRoutes)
           next({ ...to, replace: true })
         } catch (e) {

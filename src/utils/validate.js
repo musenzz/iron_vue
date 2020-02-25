@@ -15,6 +15,7 @@ export function isExternal (path) {
  * @returns {Boolean}
  */
 export function validUsername (str) {
+  // eslint-disable-next-line camelcase
   const valid_map = ['admin', 'fengchuan', 'damu']
   return valid_map.indexOf(str.trim()) >= 0
 }
@@ -60,6 +61,7 @@ export function validAlphabets (str) {
  * @returns {Boolean}
  */
 export function validEmail (email) {
+  // eslint-disable-next-line no-useless-escape
   const reg = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
   return reg.test(email)
 }

@@ -39,7 +39,7 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           // this.loading = true
-          this.$store.dispatch('login', this.loginForm)
+          this.$store.dispatch('user/login', this.loginForm)
             .then(() => {
               this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
               this.loading = false

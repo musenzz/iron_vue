@@ -1,142 +1,35 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import {doLogin, doGetBaseInfo} from '../api/user'
-import {setToken} from '../utils/cookies'
-import Layout from '@/layout'
+import getters from './getters'
 Vue.use(Vuex)
 
-// export default new Vuex.Store({
-//   modules: {
-//     cart,
-//     products
-//   },
-//   strict: debug,
-//   plugins: debug ? [createLogger()] : []
-// })
+// 知识点1： 可用于模块的批量导入，类同于import引入同一文件夹下多个文件。
+// require.context(directory, useSubdirectories = false, regExp = /^.//);
+// 参数： 1. 读取文件的路径 2. 是否遍历文件的子目录 3. 匹配文件的正则表达式
+// 返回是一个函数，是该文件夹下的匹配文件的执行环境
+// 该函数有三个属性
+// 1. resolve {Function} -接受一个参数request,request为test文件夹下面匹配文件的相对路径,返回这个匹配文件相对于整个工程的相对路径
+// 2. keys {Function} -返回匹配成功模块的名字组成的数组
+const modulesFiles = require.context('./modules', true, /\.js$/)
+
+// 知识点2：reduce(()=> {total, currentValue, currentIndex, arr}, initValue)
+// 参数： 1. 执行每条数据的函数 2. 传递给函数的初始值，可选（以前没发现初始值的妙用-可用于统计个数、去重等）
+// 函数的参数
+// 1. total             必需。初始值, 或者计算结束后的返回值。如果设置初始值就用初始值，否则就是函数的第一条数据
+// 2. currentValue     必需。当前元素
+
+const modules = modulesFiles.keys().reduce((modules, modulePath) => {
+  // 忽略第1个js
+  const moduleName = modulePath.replace(/^\.\/(.*)\.\w+$/, '$1')
+  // 执行modulesFiles函数，返回一个对象{default: {// 文件内容}, _esModule: true}
+  const value = modulesFiles(modulePath)
+  modules[moduleName] = value.default
+  return modules
+}, {})
 
 const store = new Vuex.Store({
-  state: {
-    token: 'this is token',
-    name: '',
-    avatar: '',
-    roles: [],
-    routes: [],
-    views: ['/dashboard'],
-    visitedViews: []
-  },
-  getters: {
-    token: state => state.token,
-    roles: state => state.roles,
-    routes: state => state.routes,
-    visitedViews: state => state.visitedViews
-  },
-  mutations: {
-    SET_TOKEN: (state, token) => {
-      state.token = token
-    },
-    SET_ROLES: (state, roles) => {
-      state.roles = roles
-    },
-    SET_ROUTES: (state, routes) => {
-      state.routes = routes
-    },
-    ADD_VISITED_VIEW: (state, view) => {
-      if (state.visitedViews.some(v => v.path === view.path)) return
-      state.visitedViews.push(
-        Object.assign({}, view, {
-          title: view.meta.title || 'no-name'
-        })
-      )
-    }
-  },
-  actions: {
-    // 注册actions，类似vue里面的methods
-    // 通过这个修改state里面的值
-    // 可以直接用mutations修改，但是官方建议使用actions去调用mutations去修改
-    login (context, userInfo) {
-      const { username, password } = userInfo
-      return new Promise((resolve, reject) => {
-        doLogin({ username: username.trim(), password: password }).then(response => {
-          const { data } = response
-          context.commit('SET_TOKEN', data.token)
-          setToken(data.token)
-          resolve()
-        }).catch(error => {
-          reject(error)
-        })
-      })
-    },
-    getBaseInfo ({commit, state}) {
-      return new Promise((resolve, reject) => {
-        doGetBaseInfo(state.token).then(response => {
-          const { data } = response
-          const roles = ['admin']
-          commit('SET_ROLES', roles)
-          resolve(data)
-        }).catch(error => {
-          reject(error)
-        })
-      })
-    },
-    generateRouter ({commit}, menus) {
-      return new Promise(resolve => {
-        const accessedRoutes = convertRouter(menus)
-        console.log(accessedRoutes)
-        commit('SET_ROUTES', accessedRoutes)
-        resolve(accessedRoutes)
-      })
-    },
-    addVisitedView ({ commit }, view) {
-      commit('ADD_VISITED_VIEW', view)
-    },
-    addView ({ dispatch }, view) {
-      dispatch('addVisitedView', view)
-    }
-  }
+  modules,
+  getters
 })
-
-function convertRouter (menus) {
-  let accessedRouters = []
-  if (menus) {
-    menus.forEach(item => {
-      let isParent = false
-      if (item.children) {
-        isParent = true
-      }
-      let parent = assembleRouter(item, isParent)
-
-      let children = []
-      if (item.children) {
-        item.children.forEach(child => {
-          let childNode = assembleRouter(child, false)
-          children.push(childNode)
-        })
-      }
-
-      parent.children = children
-      accessedRouters.push(parent)
-    })
-  }
-  console.log(accessedRouters)
-  return accessedRouters
-}
-
-export const componentsMap = {}
-
-function assembleRouter (item, isParent) {
-  let component = Layout
-  if (isParent !== true) {
-    component = componentsMap[item.component]
-  }
-  let router = {
-    path: item.path,
-    name: item.name,
-    meta: item.meta,
-    hidden: item.hidden,
-    component: component
-  }
-
-  return router
-}
 
 export default store

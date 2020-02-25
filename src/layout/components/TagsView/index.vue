@@ -42,11 +42,10 @@ export default {
   },
   computed: {
     visitedViews () {
-      console.log(this.$store.state.visitedViews)
-      return this.$store.state.visitedViews
+      return this.$store.state.tagsView.visitedViews
     },
     routes () {
-      return this.$store.state.routes
+      return this.$store.state.permission.routes
     }
   },
   watch: {
@@ -94,16 +93,17 @@ export default {
     initTags () {
       const affixTags = this.affixTags = this.filterAffixTags(this.routes)
       for (const tag of affixTags) {
+        console.log(tag.name)
         // Must have tag name
         if (tag.name) {
-          this.$store.dispatch('addVisitedView', tag)
+          this.$store.dispatch('tagsView/addVisitedView', tag)
         }
       }
     },
     addTags () {
       const { name } = this.$route
       if (name) {
-        this.$store.dispatch('addView', this.$route)
+        this.$store.dispatch('tagsView/addView', this.$route)
       }
       return false
     },
