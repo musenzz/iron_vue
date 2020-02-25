@@ -9,7 +9,7 @@ import './permission'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import '@/styles/index.scss'
-Vue.config.productionTip = false
+Vue.config.productionTip = false // 你运行的Vue是开发模式。为生产部署时，请确保启用生产模式。
 
 Vue.use(ElementUI)
 

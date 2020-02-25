@@ -3,6 +3,7 @@
   <sidebar class="sidebar-container"/>
   <div class="main-container">
     <div class="fixedHeader">
+      <navbar />
       <tags-view  />
     </div>
     <app-main />
@@ -15,10 +16,11 @@ import Sidebar from './components/Sidebar'
 import TagsView from './components/TagsView'
 import ResizeMixin from './mixin/ResizeHandler'
 import AppMain from './components/AppMain'
+import Navbar from './components/Navbar'
 // import { mapState } from 'vuex'
 export default {
   name: 'Layout',
-  components: {Sidebar, TagsView, AppMain},
+  components: {Sidebar, TagsView, AppMain,Navbar},
   mixins: [ResizeMixin]
 }
 </script>

@@ -7,9 +7,9 @@
     <div class="right-menu">
       <template v-if="device!=='mobile'">
 
-        <error-log class="errLog-container right-menu-item hover-effect" />
+<!--        <error-log class="errLog-container right-menu-item hover-effect" />-->
 
-        <screenfull id="screenfull" class="right-menu-item hover-effect" />
+<!--        <screenfull id="screenfull" class="right-menu-item hover-effect" />-->
 
       </template>
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
@@ -27,54 +27,54 @@
         </el-dropdown-menu>
       </el-dropdown>
     </div>
-<!--    <el-dialog title="修改密码" :visible.sync="dialogFormVisible">-->
-<!--      <el-form-->
-<!--        ref="dataForm"-->
-<!--        v-loading="loading"-->
-<!--        element-loading-text="正在执行"-->
-<!--        element-loading-background="rgba(255,255,255,0.7)"-->
-<!--        :rules="rules"-->
-<!--        :model="temp"-->
-<!--        label-position="left"-->
-<!--        label-width="120px"-->
-<!--        style="width: 400px; margin-left:50px;"-->
-<!--      >-->
-<!--        <el-form-item label="原密码" prop="old_password">-->
-<!--          <el-input-->
-<!--            v-model="temp.old_password"-->
-<!--            show-password-->
-<!--            minlength="6"-->
-<!--            maxlength="20"-->
-<!--          />-->
-<!--        </el-form-item>-->
-<!--        <el-form-item label="新密码" prop="new_password">-->
-<!--          <el-input-->
-<!--            v-model="temp.new_password"-->
-<!--            placeholder="6-20位"-->
-<!--            show-password-->
-<!--            minlength="6"-->
-<!--            maxlength="20"-->
-<!--          />-->
-<!--        </el-form-item>-->
-<!--        <el-form-item label="再次输入新密码" prop="new_password_again">-->
-<!--          <el-input-->
-<!--            v-model="temp.new_password_again"-->
-<!--            placeholder="6-20位"-->
-<!--            show-password-->
-<!--            minlength="6"-->
-<!--            maxlength="20"-->
-<!--          />-->
-<!--        </el-form-item>-->
-<!--      </el-form>-->
-<!--      <div slot="footer" class="dialog-footer">-->
-<!--        <el-button @click="dialogFormVisible = false">-->
-<!--          {{ "取消" }}-->
-<!--        </el-button>-->
-<!--        <el-button type="primary" @click="editPwd()">-->
-<!--          {{ "确定" }}-->
-<!--        </el-button>-->
-<!--      </div>-->
-<!--    </el-dialog>-->
+    <el-dialog title="修改密码" :visible.sync="dialogFormVisible">
+      <el-form
+        ref="dataForm"
+        v-loading="loading"
+        element-loading-text="正在执行"
+        element-loading-background="rgba(255,255,255,0.7)"
+        :rules="rules"
+        :model="temp"
+        label-position="left"
+        label-width="120px"
+        style="width: 400px; margin-left:50px;"
+      >
+        <el-form-item label="原密码" prop="old_password">
+          <el-input
+            v-model="temp.old_password"
+            show-password
+            minlength="6"
+            maxlength="20"
+          />
+        </el-form-item>
+        <el-form-item label="新密码" prop="new_password">
+          <el-input
+            v-model="temp.new_password"
+            placeholder="6-20位"
+            show-password
+            minlength="6"
+            maxlength="20"
+          />
+        </el-form-item>
+        <el-form-item label="再次输入新密码" prop="new_password_again">
+          <el-input
+            v-model="temp.new_password_again"
+            placeholder="6-20位"
+            show-password
+            minlength="6"
+            maxlength="20"
+          />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">
+          {{ "取消" }}
+        </el-button>
+        <el-button type="primary" @click="editPwd()">
+          {{ "确定" }}
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -116,52 +116,52 @@ export default {
       'device'
     ])
   },
-  // methods: {
-  //   toggleSideBar () {
-  //     this.$store.dispatch('app/toggleSideBar')
-  //   },
-  //   async logout () {
-  //     await this.$store.dispatch('user/logout')
-  //     this.$router.push(`/login?redirect=${this.$route.fullPath}`)
-  //   },
-  //   resetTemp () {
-  //     this.temp = {
-  //       old_password: '',
-  //       new_password: '',
-  //       new_password_again: ''
-  //     }
-  //   },
-  //   handleEditPwd () {
-  //     this.resetTemp()
-  //     this.dialogFormVisible = true
-  //     this.loading = false
-  //     this.$nextTick(() => {
-  //       this.$refs['dataForm'].clearValidate()
-  //     })
-  //   },
-  //   editPwd () {
-  //     this.$refs['dataForm'].validate((valid) => {
-  //       if (valid) {
-  //         if (this.temp.new_password !== this.temp.new_password_again) {
-  //           this.$message.error('两次输入的密码不一致')
-  //           return
-  //         }
-  //         this.loading = true
-  //         requestEditPwd(this.temp).then(response => {
-  //           this.dialogFormVisible = false
-  //           this.$notify({
-  //             title: '成功',
-  //             message: '修改成功',
-  //             type: 'success',
-  //             duration: 2000
-  //           })
-  //         }).catch(() => {
-  //           this.loading = false
-  //         })
-  //       }
-  //     })
-  //   }
-  // }
+  methods: {
+    toggleSideBar () {
+      this.$store.dispatch('app/toggleSideBar')
+    },
+    async logout () {
+      await this.$store.dispatch('user/logout')
+      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+    },
+    resetTemp () {
+      this.temp = {
+        old_password: '',
+        new_password: '',
+        new_password_again: ''
+      }
+    },
+    handleEditPwd () {
+      this.resetTemp()
+      this.dialogFormVisible = true
+      this.loading = false
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
+    editPwd () {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          if (this.temp.new_password !== this.temp.new_password_again) {
+            this.$message.error('两次输入的密码不一致')
+            return
+          }
+          this.loading = true
+          requestEditPwd(this.temp).then(response => {
+            this.dialogFormVisible = false
+            this.$notify({
+              title: '成功',
+              message: '修改成功',
+              type: 'success',
+              duration: 2000
+            })
+          }).catch(() => {
+            this.loading = false
+          })
+        }
+      })
+    }
+  }
 }
 </script>
 
