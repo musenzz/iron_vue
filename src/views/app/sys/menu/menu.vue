@@ -1,45 +1,10 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input
-        v-model="listQuery.key"
-        placeholder="请输入内容"
-        clearable
-        prefix-icon="el-icon-search"
-        style="width: 200px;"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-        @clear="handleFilter"
-      />
-      <el-select
-        v-model="listQuery.type"
-        placeholder="类型"
-        clearable
-        style="width: 90px"
-        class="filter-item"
-        @change="handleFilter"
-      >
-        <el-option
-          v-for="item in menuTypeOptions"
-          :key="item.key"
-          :label="item.display_name"
-          :value="item.key"
-        />
-      </el-select>
-      <el-button
-        v-waves
-        class="filter-item"
-        type="primary"
-        icon="el-icon-search"
-        @click="handleFilter"
-      >
-        {{ "搜索" }}
-      </el-button>
       <el-button
         class="filter-item"
-        style="margin-left: 10px;"
         type="primary"
-        icon="el-icon-edit"
+        icon="el-icon-plus"
         @click="handleCreate"
       >
         {{ "添加" }}
@@ -67,25 +32,10 @@ import MenuAdd from './add'
 import MenuDetail from './details'
 import MenuEdit from './edit'
 
-const menuTypeOptions = [
-  { key: 1, display_name: '模块' },
-  { key: 2, display_name: '菜单' },
-  { key: 3, display_name: '操作' }
-]
-
 export default {
   name: 'Menu',
   components: { MenuEdit, MenuDetail, MenuAdd, dragTreeTable },
   directives: { waves },
-  filters: {
-    statusFilter (status) {
-      const statusMap = {
-        1: '启用',
-        2: '不启用'
-      }
-      return statusMap[status]
-    }
-  },
   data () {
     return {
       treeData: {
@@ -98,27 +48,7 @@ export default {
           parent_id: 'parent_id'
         }
       },
-      valueIdSelectTree: 0,
-      valueIdSelectTree2: 0,
-      propsSelectTree: {
-        value: 'id',
-        label: 'name',
-        children: 'children',
-        placeholder: '父级'
-      },
-      tableKey: 0,
-      list: [],
-      listLoading: true,
-      loading: true,
-      listQuery: {
-        page: 1,
-        limit: 20,
-        parent_id: undefined,
-        key: undefined,
-        menu_type: undefined,
-        sort: '-id'
-      },
-      menuTypeOptions
+      listLoading: true
 
     }
   },
@@ -141,7 +71,7 @@ export default {
         width: 200,
         align: 'left',
         formatter: item => {
-          return '<span>' + item.uri + '</span>'
+          return '<span>' + item.url + '</span>'
         }
       },
       {
@@ -149,16 +79,16 @@ export default {
         title: '类型',
         field: 'menuType',
         width: 200,
-        align: 'left',
+        align: 'center',
         formatter: item => {
-          if (item.menuType === 1) {
-            return '<span v-if="{{item.menuType==1}}" style="color: #30395C">模块</span> '
+          if (item.menu_type === 1) {
+            return '<span v-if="{{item.menu_type==1}}" style="color: #3399CC">模块</span> '
           }
-          if (item.menuType === 2) {
-            return '<span v-if="item.menuType==2" style="color: #4A6491">菜单</span>'
+          if (item.menu_type === 2) {
+            return '<span v-if="item.menu_type==2" style="color: #67B8DE">菜单</span>'
           }
-          if (item.menuType === 3) {
-            return '<span v-if="item.menuType==3" style="color: #85A5CC">操作</span>'
+          if (item.menu_type === 3) {
+            return '<span v-if="item.menu_type==3" style="color: #91C9E8">操作</span>'
           }
         }
       },
@@ -167,7 +97,7 @@ export default {
         title: '代码',
         field: 'code',
         width: 200,
-        align: 'left',
+        align: 'center',
         formatter: item => {
           return '<span>' + item.code + '</span>'
         }
@@ -177,7 +107,7 @@ export default {
         title: '图标',
         field: 'icon',
         width: 200,
-        align: 'left',
+        align: 'center',
         formatter: item => {
           return '<span>' + item.icon + '</span>'
         }
@@ -187,9 +117,10 @@ export default {
         title: '操作类型',
         field: 'operateType',
         width: 200,
-        align: 'left',
+        align: 'center',
+        open: true,
         formatter: item => {
-          return '<span>' + item.operateType + '</span>'
+          return '<span>' + item.operate_type + '</span>'
         }
       },
       {
@@ -202,7 +133,7 @@ export default {
             text: '查看菜单',
             onclick: this.onDetail,
             formatter: item => {
-              return '<i>查看菜单 </i>'
+              return '<i style="color: #09ff76">查看 </i>'
             }
           },
           {
@@ -241,16 +172,10 @@ export default {
     },
     getList () {
       this.listLoading = true
-      requestList(this.listQuery).then(response => {
-        this.treeData.lists = response.data.items
+      requestList().then(response => {
+        this.treeData.lists = response.data
         this.listLoading = false
-        this.$refs.treeTable.OpenAll()
       })
-    },
-    handleFilter () {
-      this.listQuery.parent_id = this.valueIdSelectTree
-      this.listQuery.page = 1
-      this.getList()
     },
     handleCreate () {
       this.$refs.addDialog.openDialog()

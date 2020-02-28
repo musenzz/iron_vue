@@ -1,5 +1,6 @@
 <template>
-  <el-dialog title="添加菜单" :visible.sync="showDialog">
+  <el-dialog title="编辑菜单" :visible.sync="showDialog">
+
     <el-form
       ref="dataForm"
       v-loading="loading"
@@ -36,16 +37,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="父级" prop="parent_id">
-        <SelectTree
-          v-model.number="formData.parent_id"
-          type="number"
-          :props="propsSelectTree"
-          :options="optionDataSelectTree"
-          :value="valueIdSelectTree2"
-          :clearable="true"
-          :accordion="true"
-          @getValue="getSelectTreeValue($event, 2)"
-        />
+        <tree-select v-model="treeNodeId" :multiple="false" :options="treeSelectOptions" :load-options="loadOptions"/>
       </el-form-item>
       <el-form-item label="名称" prop="name">
         <el-input v-model="formData.name" />
@@ -72,24 +64,22 @@
         <el-input v-model="formData.memo" />
       </el-form-item>
     </el-form>
+
     <div
       slot="footer"
       class="dialog-footer"
     >
       <el-button @click="closeDialog">{{ "取消" }}</el-button>
-      <el-button type="primary" @click="doAdd">{{ "确定" }}</el-button>
+      <el-button type="primary" @click="doUpdate">{{ "确定" }}</el-button>
     </div>
   </el-dialog>
 </template>
 
 <script>
-import {
-  requestCreate, requestUpdate,
-  requestAll
-} from '@/api/app/sys/menu'
-import SelectTree from '@/components/TreeSelect'
+import {requestUpdate, requestAll} from '@/api/app/sys/menu'
 import { alertSuccess } from '../../../../utils/common-util'
-import dragTreeTable from 'drag-tree-table'
+import TreeSelect from '@riophae/vue-treeselect'
+import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 const menuTypeOptions = [
   { key: 1, display_name: '模块' },
   { key: 2, display_name: '菜单' },
@@ -108,95 +98,64 @@ const menuOperateTypeOptions = [
 ]
 export default {
   name: 'MenuEdit',
-  components: { SelectTree, dragTreeTable },
+  components: { TreeSelect },
   data () {
     return {
       showDialog: false,
       formData: {},
+      loading: false,
       menuTypeOptions,
       menuOperateTypeOptions,
-      propsSelectTree: {
-        value: 'id',
-        label: 'name',
-        children: 'children',
-        placeholder: '父级'
-      },
+      treeNodeId: null,
+      treeSelectOptions: [],
       rules: {
-        type: [{ required: true, message: '请选择类型', trigger: 'change' }],
+        menu_type: [{ required: true, message: '请选择菜单类型', trigger: 'change' }],
+        operate_type: [{ required: true, message: '请选择操作类型', trigger: 'change' }],
+        url: [{ required: true, message: '请输入url', trigger: 'change' }],
         name: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }],
         code: [{ required: true, message: '请输入菜单代码', trigger: 'blur' }],
         sequence: [{ required: true, message: '请输入排序值', trigger: 'blur' }]
-      },
-      propsSelectList: [],
-      propsSelectlist2: [
-        { id: 0, parent_id: -1, name: '顶级' }
-      ],
-      valueIdSelectTree: 0,
-      valueIdSelectTree2: 0
+      }
     }
   },
   created () {
     this.getAll()
   },
-  computed: {
-    optionDataSelectTree () {
-      const cloneData = JSON.parse(JSON.stringify(this.propsSelectList))
-      return cloneData.filter(father => {
-        const branchArr = cloneData.filter(child => father.id === child.parent_id)
-        branchArr.length > 0 ? father.children = branchArr : ''
-        return father.parent_id === this.propsSelectList[0].parent_id
-      })
-    }
-  },
   methods: {
-    openDialog () {
-      this.showDialog = true
+    openDialog (rowData) {
       this.resetFormData()
+      this.formData = rowData
+      this.showDialog = true
+      if (rowData.parent_id !== 0) {
+        this.treeNodeId = rowData.parent_id
+      }
     },
     closeDialog () {
       this.showDialog = false
     },
     resetFormData () {
-      this.formData = {
-        status: 1,
-        memo: ''
-      }
       this.loading = false
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
+      this.formData = {}
     },
     getAll () {
       requestAll().then(response => {
         if (response.data) {
-          this.propsSelectList = response.data
-        } else {
-          this.propsSelectList = this.propsSelectlist2
+          this.treeSelectOptions = response.data
         }
       })
     },
-    updateData () {
+    loadOptions ({ action, parentNode, callback }) {
+
+    },
+    doUpdate () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.loading = true
-          this.formData.parent_id = this.valueIdSelectTree2
-          const tempData = Object.assign({}, this.temp)
-          requestUpdate(tempData).then(() => {
-            for (const v of this.list) {
-              if (v.id === this.formData.id) {
-                const index = this.list.indexOf(v)
-                this.list.splice(index, 1, this.temp)
-                break
-              }
-            }
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
-            })
-            this.getAll()
+          this.formData.parent_id = this.treeNodeId
+          requestUpdate(this.formData).then(response => {
+            this.showDialog = false
+            alertSuccess(this, response)
+            this.$parent.getList()
           }).catch(() => {
             this.loading = false
           })

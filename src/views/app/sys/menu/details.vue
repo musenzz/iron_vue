@@ -15,6 +15,7 @@
           v-model.number="formData.menu_type"
           type="number"
           placeholder="菜单类型"
+          disabled
         >
           <el-option
             v-for="item in menuTypeOptions"
@@ -25,7 +26,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="操作类型" prop="operate_type">
-        <el-select v-model.number="formData.operate_type" placeholder="操作类型">
+        <el-select v-model.number="formData.operate_type" placeholder="操作类型" disabled>
           <el-option
             v-for="item in menuOperateTypeOptions"
             :key="item.key"
@@ -35,31 +36,24 @@
         </el-select>
       </el-form-item>
       <el-form-item label="父级" prop="parent_id">
-        <SelectTree
-          v-model.number="formData.parent_id"
-          type="number"
-          :props="propsSelectTree"
-          :options="optionDataSelectTree"
-          :value="valueIdSelectTree2"
-          :clearable="true"
-          :accordion="true"
-          @getValue="getSelectTreeValue($event, 2)"
-        />
+        <tree-select v-model="treeNodeId" :multiple="false"  disabled
+                     :options="treeSelectOptions"
+                     :load-options="loadOptions"/>
       </el-form-item>
       <el-form-item label="名称" prop="name">
-        <el-input v-model="formData.name" />
+        <el-input v-model="formData.name" :disabled="true"/>
       </el-form-item>
       <el-form-item label="菜单url" prop="url">
-        <el-input v-model="formData.url" />
+        <el-input v-model="formData.uri" :disabled="true"/>
       </el-form-item>
       <el-form-item label="代码" prop="code">
-        <el-input v-model="formData.code" />
+        <el-input v-model="formData.code" :disabled="true"/>
       </el-form-item>
       <el-form-item label="图标" prop="icon">
-        <el-input v-model="formData.icon" />
+        <el-input v-model="formData.icon" :disabled="true"/>
       </el-form-item>
       <el-form-item label="排序值" prop="sequence">
-        <el-input v-model.number="formData.sequence" type="number" />
+        <el-input v-model.number="formData.sequence" type="number" :disabled="true"/>
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-radio-group v-model.number="formData.status" type="number">
@@ -68,19 +62,19 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="备注" prop="memo">
-        <el-input v-model="formData.memo" />
+        <el-input v-model="formData.memo" :disabled="true"/>
       </el-form-item>
     </el-form>
-    <div slot="footer" class="dialog-footer">
+    <div slot="footer" class="dialog-footer" style="text-align: center">
       <el-button type="primary" @click="closeDialog">{{ "关闭" }}</el-button>
     </div>
   </el-dialog>
 </template>
 
 <script>
-import SelectTree from '@/components/TreeSelect'
-import { alertSuccess } from '../../../../utils/common-util'
-import dragTreeTable from 'drag-tree-table'
+import { requestAll } from '@/api/app/sys/menu'
+import TreeSelect from '@riophae/vue-treeselect'
+import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 const menuTypeOptions = [
   { key: 1, display_name: '模块' },
   { key: 2, display_name: '菜单' },
@@ -99,62 +93,46 @@ const menuOperateTypeOptions = [
 ]
 export default {
   name: 'MenuDetail',
-  components: { SelectTree, dragTreeTable },
+  components: { TreeSelect },
   data () {
     return {
       showDialog: false,
       formData: {},
+      loading: false,
       menuTypeOptions,
       menuOperateTypeOptions,
-      propsSelectTree: {
-        value: 'id',
-        label: 'name',
-        children: 'children',
-        placeholder: '父级'
-      },
-      rules: {
-        type: [{ required: true, message: '请选择类型', trigger: 'change' }],
-        name: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }],
-        code: [{ required: true, message: '请输入菜单代码', trigger: 'blur' }],
-        sequence: [{ required: true, message: '请输入排序值', trigger: 'blur' }]
-      },
-      propsSelectList: [],
-      propsSelectlist2: [
-        { id: 0, parent_id: -1, name: '顶级' }
-      ],
-      valueIdSelectTree: 0,
-      valueIdSelectTree2: 0
+      treeNodeId: null,
+      treeSelectOptions: []
     }
   },
-  computed: {
-    optionDataSelectTree () {
-      const cloneData = JSON.parse(JSON.stringify(this.propsSelectList))
-      return cloneData.filter(father => {
-        const branchArr = cloneData.filter(child => father.id === child.parent_id)
-        branchArr.length > 0 ? father.children = branchArr : ''
-        return father.parent_id === this.propsSelectList[0].parent_id
-      })
-    }
+  created () {
+    this.getAll()
   },
   methods: {
     openDialog (rowData) {
-      console.log(rowData)
-      this.showDialog = true
       this.resetFormData()
       this.formData = rowData
+      this.showDialog = true
+      if (rowData.parent_id !== 0) {
+        this.treeNodeId = rowData.parent_id
+      }
     },
     closeDialog () {
       this.showDialog = false
     },
     resetFormData () {
-      this.formData = {
-        status: 1,
-        memo: ''
-      }
       this.loading = false
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
+      this.formData = {}
+    },
+    getAll () {
+      requestAll().then(response => {
+        if (response.data) {
+          this.treeSelectOptions = response.data
+        }
       })
+    },
+    loadOptions ({ action, parentNode, callback }) {
+
     }
   }
 }
